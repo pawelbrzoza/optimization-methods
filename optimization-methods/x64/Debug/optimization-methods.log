@@ -1,0 +1,7 @@
+﻿  main.cpp
+  matrix.cpp
+  ode_solver.cpp
+  opt_alg.cpp
+  solution.cpp
+  Generating Code...
+  optimization-methods.vcxproj -> C:\Users\Paweł\Documents\GitHub\optimization-methods\x64\Debug\optimization-methods.exe
