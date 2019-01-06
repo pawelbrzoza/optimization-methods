@@ -1,7 +1,4 @@
 ﻿  main.cpp
-  matrix.cpp
-  ode_solver.cpp
-  opt_alg.cpp
-  solution.cpp
-  Generating Code...
+c:\users\paweł\documents\github\optimization-methods\optimization-methods\main.cpp(307): warning C4101: 'H_calls_CG_const_2': unreferenced local variable
+c:\users\paweł\documents\github\optimization-methods\optimization-methods\main.cpp(307): warning C4101: 'H_calls_CG_const_1': unreferenced local variable
   optimization-methods.vcxproj -> C:\Users\Paweł\Documents\GitHub\optimization-methods\x64\Debug\optimization-methods.exe

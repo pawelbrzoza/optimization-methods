@@ -415,3 +415,261 @@ solution pen_inside(matrix x0, double c, double a, double epsilon, int Nmax)
 		X = X1;
 	}
 }
+
+solution golden(double a, double b, double epsilon, int Nmax, matrix P) {
+	double alfa = (sqrt(5.0) - 1) / 2;
+	solution A(a), B(b), C, D;
+	C.x = B.x - alfa * (B.x - A.x);
+	C.fit_fun(P);
+	D.x = A.x + alfa * (B.x - A.x);
+	D.fit_fun(P);
+	while (true) {
+		if (C.y < D.y) {
+			B = D;
+			D = C;
+			C.x = B.x - alfa * (B.x - A.x);
+			C.fit_fun(P);
+		}
+		else
+		{
+			A = C;
+			C = D;
+			D.x = A.x + alfa * (B.x - A.x);
+			D.fit_fun(P);
+		}
+		if (B.x - A.x<epsilon || solution::f_calls>Nmax) {
+			A.x = (A.x + B.x) / 2.0;
+			A.fit_fun(P);
+			return A;
+		}
+	}
+}
+
+solution SD_const_1(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	h.x = 0.05;
+	double b;
+	while (true) {
+		X.grad();
+		d = -X.g;
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X = X1;
+	}
+}
+
+solution SD_const_2(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	h.x = 0.12;
+	double b;
+	while (true) {
+		X.grad();
+		d = -X.g;
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X = X1;
+	}
+}
+
+solution SD(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	double b;
+	while (true) {
+		X.grad();
+		d = -X.g;
+		P = set_col(P, X.x, 0);
+		P = set_col(P, d, 1);
+		b = compute_b(X.x, d);
+		h = golden(0, b, epsilon, Nmax, P);
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X = X1;
+	}
+}
+
+solution CG_const_1(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	h.x = 0.05;
+	double b, beta;
+	X.grad();
+	d = -X.g;
+	while (true)
+	{
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X1.grad();
+		beta = pow(norm(X1.g), 2) / pow(norm(X.g), 2);
+		d = -X1.g + beta * d;
+		X = X1;
+	}
+}
+
+solution CG_const_2(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	h.x = 0.12;
+	double b, beta;
+	X.grad();
+	d = -X.g;
+	while (true)
+	{
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X1.grad();
+		beta = pow(norm(X1.g), 2) / pow(norm(X.g), 2);
+		d = -X1.g + beta * d;
+		X = X1;
+	}
+}
+
+solution CG(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	double b, beta;
+	X.grad();
+	d = -X.g;
+	while (true)
+	{
+		P = set_col(P, X.x, 0);
+		P = set_col(P, d, 1);
+		b = compute_b(X.x, d);
+		h = golden(0, b, epsilon, Nmax, P);
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X1.grad();
+		beta = pow(norm(X1.g), 2) / pow(norm(X.g), 2);
+		d = -X1.g + beta * d;
+		X = X1;
+	}
+}
+
+solution Newton_const_1(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	h.x = 0.05;
+	double b;
+	while (true) {
+		X.grad();
+		X.hess();
+		d = -inv(X.H)*X.g;
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X = X1;
+	}
+}
+
+solution Newton_const_2(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	h.x = 0.12;
+	double b;
+	while (true) {
+		X.grad();
+		X.hess();
+		d = -inv(X.H)*X.g;
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X = X1;
+	}
+}
+
+solution Newton(matrix x0, double epsilon, int Nmax) {
+	int *n = get_size(x0);
+	solution X, X1;
+	X.x = x0;
+	matrix d(n[0], 1), P(n[0], 2);
+	solution h;
+	double b;
+	while (true) {
+		X.grad();
+		X.hess();
+		d = -inv(X.H)*X.g;
+		P = set_col(P, X.x, 0);
+		P = set_col(P, d, 1);
+		b = compute_b(X.x, d);
+		h = golden(0, b, epsilon, Nmax, P);
+		X1.x = X.x + h.x*d;
+		if (norm(X.x - X1.x) < epsilon || solution::f_calls > Nmax || solution::g_calls > Nmax)
+		{
+			X1.fit_fun();
+			return X1;
+		}
+		X = X1;
+	}
+}
+
+double compute_b(matrix x, matrix d) {
+	int *n = get_size(x);
+	double b = 1e9, bi;
+	for (int i = 0; i < n[0]; ++i) {
+		if (d(i) == 0)
+			bi = 1e9;
+		else if (d(i) > 0)
+			bi = (10 - x(i)) / d(i);
+		else
+			bi = (-10 - x(i)) / d(i);
+		if (b > bi)
+			b = bi;
+	}
+	return b;
+}

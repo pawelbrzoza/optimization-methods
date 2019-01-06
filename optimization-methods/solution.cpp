@@ -24,7 +24,7 @@ solution::solution(double *A, int n)
 
 //You can edit the following code
 
-void solution::fit_fun()
+void solution::fit_fun(matrix A)
 {
 	//*********************** LAB 2 ***********************************
 
@@ -39,7 +39,7 @@ void solution::fit_fun()
 
 	//*********************** LAB 3 ***********************************
 
-	double a_ref = 3.14, o_ref = 0;
+	/*double a_ref = 3.14, o_ref = 0;
 	matrix Y0(2, 1);
 	matrix *Y = solve_ode(0, 0.1, 100, Y0, x);
 	int *n = get_size(Y[1]);
@@ -49,7 +49,20 @@ void solution::fit_fun()
 		pow(o_ref - Y[1](i, 1), 2) +
 		pow(x(0)*(a_ref - Y[1](i, 0)) + x(1) * (o_ref - Y[1](i, 1)), 2);
 	y = y * 0.1;
-	++f_calls;
+	++f_calls;*/
+
+	//*********************** LAB 5 ***********************************
+	int *n = get_size(A);
+	if (n[1] == 1) {
+		y = pow(x(0) + 2 * x(1) - 7, 2) + pow(2 * x(0) + x(1) - 5, 2);
+		++f_calls;
+	}
+	else {
+		solution T;
+		T.x = A[0] + x * A[1];
+		T.fit_fun();
+		y = T.y;
+	}
 }
 
 void solution::fit_fun_outside(matrix A)
@@ -92,12 +105,19 @@ void solution::fit_fun_inside(matrix A)
 
 void solution::grad()
 {
-	g = NAN;
+	//*********************** LAB 5 ***********************************
+	g = matrix(2, 1);
+	g(0) = 10 * x(0) + 8 * x(1) - 34;
+	g(1) = 8 * x(0) + 10 * x(1) - 38;
 	++g_calls;
 }
 
 void solution::hess()
 {
-	H = NAN;
+	//*********************** LAB 5 ***********************************
+	H = matrix(2, 2);
+	H(0, 0) = 10;
+	H(0, 1) = H(1, 0) = 8;
+	H(1, 1) = 10;
 	++H_calls;
 }

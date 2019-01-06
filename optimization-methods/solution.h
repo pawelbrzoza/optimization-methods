@@ -18,7 +18,7 @@ public:
 	static int H_calls;
 	solution(double = NAN);
 	solution(double *, int);
-	void solution::fit_fun();
+	void solution::fit_fun(matrix A = 0.0);
 	void solution::fit_fun_outside(matrix A = 0.0);
 	void solution::fit_fun_inside(matrix A = 0.0);
 	void grad();
